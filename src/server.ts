@@ -17,6 +17,12 @@ const PORT = process.env.PORT || 3001;
 // MIDDLEWARES
 // ============================================================
 
+const allowedOrigins = [
+  "https://cda-app.com",
+  "https://www.cda-app.com",
+  // Add other explicitly authorized frontend origins.
+];
+
 app.use(cors()); //TODO: Agregar resctricciones por que como esta ahora esta muy abierto
 app.use(express.json()); //Aqui dice: Si llega una petición con JSON en el body, conviértelo para que pueda acceder a él mediante req.body
 
@@ -38,11 +44,32 @@ async function initializeBrowser() {
   browser = await chromium.launch({
     headless: true,
     
+    args: [
+      '--disable-blink-features=AutomationControlled',
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      // Forzar simulación de renderizado por hardware, evitando huellas de SwiftShader
+      '--use-gl=desktop',
+      // Desactivar algunas características que exponen el modo headless
+      '--disable-features=IsolateOrigins,site-per-process',
+    ],
+    
   });
 
   globalContext = await browser.newContext({
-    
+    // El UA debe coincidir con la versión del núcleo de Chromium, no uses UA de Firefox
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+    viewport: { width: 1920, height: 1080 },
+    // Configuración regional coherente con la IP
+    locale: 'es-CO',
+    timezoneId: 'America/Bogota',
+    permissions: ['geolocation'], // Simular una configuración de permisos razonable
   });
+
+
+/** 
+
+
 
   // ----------------------------------------------------------
   // Página de Warm-up
@@ -75,11 +102,20 @@ async function initializeBrowser() {
     // Breve pausa de estabilización opcional para asegurar que los scripts internos terminen de montar los eventos
     await warmUpPage.waitForTimeout(6000);
 
+
+
+
+
+
+
     console.log("✅ Warm-up completado con éxito.");
   } catch (error) {
     console.error("❌ Error durante el warm-up del RUNT:", error);
     throw error;
   }
+
+*/
+
 }
 
 // ============================================================

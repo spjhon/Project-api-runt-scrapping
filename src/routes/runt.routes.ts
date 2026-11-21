@@ -16,7 +16,7 @@ interface RuntSession {
 
 const router = Router();
 
-const SESSION_TIMEOUT = 30000;
+const SESSION_TIMEOUT = 120000;
 
 // ============================================================
 // SESIONES ACTIVAS
@@ -369,14 +369,18 @@ export default function createRuntRoutes(
         // TIPO DE SERVICIO
         // ======================================================
 
-        const tipoServicioRaw = await page.$eval(
-          selectorServicio,
-          (el) => el.textContent,
-        );
+ const tipoServicioRaw = await page.$eval(
+  selectorServicio,
+  (el) => el.textContent,
+);
 
-        const tipoServicio = tipoServicioRaw
-          ? tipoServicioRaw.trim().toLowerCase()
-          : "";
+let tipoServicio = tipoServicioRaw
+  ? tipoServicioRaw.trim().toLowerCase()
+  : "";
+
+if (tipoServicio === "público") {
+  tipoServicio = "publico";
+}
 
         // ======================================================
         // CLASE DEL VEHÍCULO
